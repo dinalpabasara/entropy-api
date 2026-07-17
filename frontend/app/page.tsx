@@ -3,12 +3,14 @@
 import { useEffect, useState, useCallback } from 'react'
 import MemoryCard from '@/components/MemoryCard'
 import CreateMemory from '@/components/CreateMemory'
-import { exploreMemories, upvoteMemory } from '@/lib/api'
+import ApiKeyPrompt from '@/components/ApiKeyPrompt'
+import { exploreMemories, getApiKey } from '@/lib/api'
 import type { Memory } from '@/lib/api'
 
 export default function Home() {
   const [memories, setMemories] = useState<Memory[]>([])
   const [loading, setLoading] = useState(true)
+  const [authed, setAuthed] = useState(!!getApiKey())
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -41,7 +43,9 @@ export default function Home() {
         </p>
       </div>
 
-      <CreateMemory onCreated={load} />
+      <ApiKeyPrompt onReady={() => setAuthed(true)} />
+
+      {authed && <CreateMemory onCreated={load} />}
 
       {loading ? (
         <div className="text-center py-20">

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createMemory } from '@/lib/api'
+import { createMemory, getApiKey } from '@/lib/api'
 
 interface Props {
   onCreated: () => void
@@ -10,17 +10,23 @@ interface Props {
 export default function CreateMemory({ onCreated }: Props) {
   const [content, setContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!content.trim()) return
+    if (!getApiKey()) {
+      setError('Set an API key first')
+      return
+    }
     setSubmitting(true)
+    setError('')
     try {
       await createMemory(content.trim())
       setContent('')
       onCreated()
     } catch (err) {
-      console.error(err)
+      setError(String(err))
     }
     setSubmitting(false)
   }
@@ -43,7 +49,7 @@ export default function CreateMemory({ onCreated }: Props) {
         />
         <button
           type="submit"
-          disabled={submitting || !content.trim()}
+          disabled={submitting || !content.trim() || !getApiKey()}
           className="px-5 py-2.5 bg-matrix/10 border border-matrix/40 text-matrix
                      text-sm font-mono rounded hover:bg-matrix/20
                      disabled:opacity-40 disabled:cursor-not-allowed transition-all"
@@ -51,6 +57,7 @@ export default function CreateMemory({ onCreated }: Props) {
           {submitting ? 'WRITING...' : 'COMMIT'}
         </button>
       </div>
+      {error && <div className="mt-1 text-[11px] text-decay">{error}</div>}
     </form>
   )
 }

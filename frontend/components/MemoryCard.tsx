@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import type { Memory } from '@/lib/api'
-import { upvoteMemory } from '@/lib/api'
+import { upvoteMemory, getApiKey } from '@/lib/api'
 
 interface Props {
   memory: Memory
@@ -11,6 +11,7 @@ interface Props {
 
 export default function MemoryCard({ memory, onUpdate }: Props) {
   const [stabilizing, setStabilizing] = useState(false)
+  const [error, setError] = useState('')
 
   const healthColor =
     memory.health_score > 60 ? 'text-matrix' :
@@ -18,12 +19,17 @@ export default function MemoryCard({ memory, onUpdate }: Props) {
     'text-decay'
 
   async function handleStabilize() {
+    if (!getApiKey()) {
+      setError('Set an API key first')
+      return
+    }
     setStabilizing(true)
+    setError('')
     try {
       const updated = await upvoteMemory(memory.id)
       onUpdate?.(updated)
     } catch (e) {
-      console.error(e)
+      setError(String(e))
     }
     setStabilizing(false)
   }
@@ -79,7 +85,7 @@ export default function MemoryCard({ memory, onUpdate }: Props) {
       {memory.is_alive && (
         <button
           onClick={handleStabilize}
-          disabled={stabilizing}
+          disabled={stabilizing || !getApiKey()}
           className="mt-3 w-full py-1.5 text-xs border border-matrix/40 text-matrix
                      hover:bg-matrix/10 transition-all rounded
                      disabled:opacity-40 disabled:cursor-not-allowed"
@@ -87,6 +93,7 @@ export default function MemoryCard({ memory, onUpdate }: Props) {
           {stabilizing ? 'STABILIZING...' : '[STABILIZE]'}
         </button>
       )}
+      {error && <div className="mt-1 text-[10px] text-decay">{error}</div>}
     </div>
   )
 }
