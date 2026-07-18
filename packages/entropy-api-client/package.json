@@ -1,0 +1,37 @@
+{
+  "name": "@dinalpabasara/entropy-api-client",
+  "version": "0.1.0",
+  "description": "JavaScript client for the Entropy API — a living data ecosystem where memories decay when unobserved.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "prepublishOnly": "npm run build"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "keywords": [
+    "entropy",
+    "api",
+    "client",
+    "decay",
+    "memory",
+    "fastapi"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dinalpabasara/entropy-api.git",
+    "directory": "packages/entropy-api-client"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0"
+  }
+}
